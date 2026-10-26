@@ -13,10 +13,10 @@ export const Filter: React.FC<Props> = ({ filter, onFilterChange }) => {
       <a
         href="#/"
         className={classNames('filter__link', {
-          selected: filter === FILTERS.all,
+          selected: filter === FILTERS.All,
         })}
         data-cy="FilterLinkAll"
-        onClick={() => onFilterChange(FILTERS.all)}
+        onClick={() => onFilterChange(FILTERS.All)}
       >
         All
       </a>
@@ -24,10 +24,10 @@ export const Filter: React.FC<Props> = ({ filter, onFilterChange }) => {
       <a
         href="#/active"
         className={classNames('filter__link', {
-          selected: filter === FILTERS.active,
+          selected: filter === FILTERS.Active,
         })}
         data-cy="FilterLinkActive"
-        onClick={() => onFilterChange(FILTERS.active)}
+        onClick={() => onFilterChange(FILTERS.Active)}
       >
         Active
       </a>
@@ -35,10 +35,10 @@ export const Filter: React.FC<Props> = ({ filter, onFilterChange }) => {
       <a
         href="#/completed"
         className={classNames('filter__link', {
-          selected: filter === FILTERS.completed,
+          selected: filter === FILTERS.Completed,
         })}
         data-cy="FilterLinkCompleted"
-        onClick={() => onFilterChange(FILTERS.completed)}
+        onClick={() => onFilterChange(FILTERS.Completed)}
       >
         Completed
       </a>

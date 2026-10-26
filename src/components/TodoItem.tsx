@@ -3,17 +3,17 @@ import classNames from 'classnames';
 import { Todo } from '../types/Todo';
 
 type Props = {
-  todo: Todo & { isLoading?: boolean };
+  todo: Todo;
   onDelete?: (todoId: number) => Promise<void>;
   onUpdate?: (updatedTodo: Todo) => Promise<void>;
-  isAdding?: boolean;
+  isLoading?: boolean;
 };
 
 export const TodoItem: React.FC<Props> = ({
   todo,
   onDelete,
   onUpdate,
-  isAdding = false,
+  isLoading = false,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(todo.title);
@@ -26,7 +26,7 @@ export const TodoItem: React.FC<Props> = ({
     }
   }, [isEditing]);
 
-  const handleSubmit = async (event?: React.FormEvent) => {
+  const handleSubmit = (event?: React.FormEvent) => {
     if (event) {
       event.preventDefault();
     }
@@ -39,33 +39,25 @@ export const TodoItem: React.FC<Props> = ({
 
     if (trimmedTitle === todo.title) {
       setIsEditing(false);
-
       return;
     }
 
     isSubmittingRef.current = true;
 
-    if (!trimmedTitle) {
-      try {
-        await onDelete?.(todo.id);
+    const action = !trimmedTitle
+      ? onDelete?.(todo.id)
+      : onUpdate?.({ ...todo, title: trimmedTitle });
+
+    action
+      ?.then(() => {
         setIsEditing(false);
-      } catch {
+      })
+      .catch(() => {
         editFieldRef.current?.focus();
-      } finally {
+      })
+      .finally(() => {
         isSubmittingRef.current = false;
-      }
-
-      return;
-    }
-
-    try {
-      await onUpdate?.({ ...todo, title: trimmedTitle });
-      setIsEditing(false);
-    } catch {
-      editFieldRef.current?.focus();
-    } finally {
-      isSubmittingRef.current = false;
-    }
+      });
   };
 
   const handleKeyUp = (event: React.KeyboardEvent) => {
@@ -96,7 +88,11 @@ export const TodoItem: React.FC<Props> = ({
       </label>
 
       {isEditing ? (
-        <form onSubmit={handleSubmit} onBlur={() => handleSubmit()}>
+        <form onSubmit={handleSubmit} onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+              handleSubmit();
+            }
+          }}>
           <input
             data-cy="TodoTitleField"
             type="text"
@@ -132,7 +128,7 @@ export const TodoItem: React.FC<Props> = ({
       <div
         data-cy="TodoLoader"
         className={classNames('modal overlay', {
-          'is-active': isAdding,
+          'is-active': isLoading,
         })}
       >
         <div className="modal-background has-background-white-ter" />
